@@ -1,3 +1,6 @@
+#ifndef BLOOM_FILTER_HPP
+#define BLOOM_FILTER_HPP
+
 #include <string>
 #include <functional>
 #include <vector>
@@ -73,3 +76,5 @@ std::function<size_t(const std::string&)> hash2 = [](const std::string& s) -> si
     }
     return hash;
 };
+
+#endif

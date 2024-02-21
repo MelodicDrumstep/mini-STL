@@ -1,3 +1,6 @@
+#ifndef SKIP_LIST_HPP
+#define SKIP_LIST_HPP
+
 #include <iostream>
 #include <vector>
 #include <cstdlib>
@@ -11,7 +14,7 @@ private:
     template<typename T>
     class SkipListNode
     {
-    
+        
     };
 
 public:
@@ -28,3 +31,5 @@ public:
     // Delete a value from the skip list
     void deleteItem(T item);
 };
+
+#endif
