@@ -5,10 +5,27 @@ template <typename T>
 class UniquePtr
 {
 public:
-    UniquePtr() : _p(nullptr){};
-    UniquePtr(T * pointer) : _p(pointer) {};
-    UniquePtr(const UniquePtr & other) = delete;
-    UniquePtr& operator= (const UniquePtr & other) = delete;
+    explicit UniquePtr(T * pointer = nullptr) : _p(pointer) {};
+    ~UniquePtr()
+    {
+        delete _p;
+    }
+    UniquePtr(UniquePtr && other) noexcept : _p(other._p)
+    {
+        other._p = nullptr;
+    }
+    UniquePtr(UniquePtr& other) = delete;
+    UniquePtr& operator= (UniquePtr & other) = delete;
+    UniquePtr& operator= (UniquePtr && other) noexcept
+    {
+        if(this != &other)
+        {
+            delete _p;
+            _p = other._p;
+            other._p = nullptr;
+        }
+        return *this;
+    }
     operator bool() const
     {
         return _p != nullptr;
@@ -40,10 +57,6 @@ public:
         _p = nullptr;
         return temp;
     }
-    ~UniquePtr()
-    {
-        clear();
-    }
     
 private:
     void clear()
@@ -51,17 +64,13 @@ private:
         delete _p;
         _p = nullptr;
     }
-    void copyother(const UniquePtr<T> & other)
-    {
-        _p = new T(*other);
-    }
     T* _p;
 };
 
-template <typename T>
-UniquePtr<T> make_unique(const T & value)
+template <typename T, typename... Args>
+UniquePtr<T> make_unique(Args&&... args)
 {
-    return UniquePtr<T>(new T(value));
+    return UniquePtr<T>(new T(std::forward<Args>(args)...));
 }
 
 #endif //UNIQUE_PTR
