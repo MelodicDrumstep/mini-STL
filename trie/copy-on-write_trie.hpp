@@ -144,7 +144,7 @@ class Trie
 
     if(root_ == nullptr)
     {
-        std::cout << "root is null" << std::endl;
+        ////std::cout << "root is null" << std::endl;
         new_root = std::make_shared<TrieNode>();
         old_cur = new_root;
     }
@@ -153,17 +153,17 @@ class Trie
         new_root = root_ -> Clone();
     }
 
-    std::cout << "! " << std::endl;
+    ////std::cou << "! " << std::endl;
 
     std::shared_ptr<TrieNode> new_cur = new_root;
 
-    std::cout << "key size : " << key.size() << std::endl;
+    //std::cout << "key size : " << key.size() << std::endl;
     
-    std::cout << " find : " << (old_cur -> children_.find(key[i]) != old_cur -> children_.end()) << std::endl;
+    //std::cout << " find : " << (old_cur -> children_.find(key[i]) != old_cur -> children_.end()) << std::endl;
 
     while(i < key.size() && old_cur -> children_.find(key[i]) != old_cur -> children_.end())
     {
-        std::cout << "!!!" << std::endl;
+        //std::cout << "!!!" << std::endl;
         if(i == key.size() - 1)
         {
         std::shared_ptr<T> ptr2value = std::make_shared<T>(std::move(value));
