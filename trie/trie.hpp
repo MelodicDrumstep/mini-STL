@@ -181,15 +181,6 @@ class Trie
   // Note that `T` might be a non-copyable type. Always use `std::move` when creating `shared_ptr` on that value.
   //throw NotImplementedException("Trie::Put is not implemented.");
 
-
-//DEBUG
-    ////std::cout << "Enter function Put" << std::endl;
-    ////std::cout << "I'm currently putting : " << key << " -> " << value << std::endl;
-
-    cnt1++;
-
-//DEBUG
-
     size_t i = 0;
     std::shared_ptr<const TrieNode> old_cur = root_;
     
@@ -366,12 +357,12 @@ class TrieStore {
     //     root. Otherwise, return std::nullopt.
     //throw NotImplementedException("TrieStore::Get is not implemented.");
     root_lock_.lock();
-    Trie & cur = root_;
+    Trie * temp_root = root_;
     root_lock_.unlock();
-    const T * res = cur.Get<T>(key);
-    if (res == nullptr) 
+    const T* res = temp_root -> <T>(key);
+    if (res == nullptr)
     {
-        return std::nullopt;
+      return std::nullopt;
     }
     return ValueGuard<T>(cur, *(res));
   }
@@ -381,10 +372,11 @@ class TrieStore {
   template <class T>
   void Put(std::string_view key, T value)
   {
-    write_lock_.lock();
     root_lock_.lock();
-    root_ = root_.Put<T>(key, std::move(value));
+    Trie * temp_root = &root_;
     root_lock_.unlock();
+    write_lock_.lock();
+    root_ = temp_root -> Put<T>(key, std::move(value));
     write_lock_.unlock();
   }
 
@@ -394,10 +386,11 @@ class TrieStore {
     // You will need to ensure there is only one writer at a time. Think of how you can achieve this.
     // The logic should be somehow similar to `TrieStore::Get`.
     //throw NotImplementedException("TrieStore::Remove is not implemented.");
-    write_lock_.lock();
     root_lock_.lock();
-    root_ = root_.Remove(key);
+    Trie * temp_root = &root_;
     root_lock_.unlock();
+    write_lock_.lock();
+    root_ = temp_root -> Remove(key);
     write_lock_.unlock();
   }
 
