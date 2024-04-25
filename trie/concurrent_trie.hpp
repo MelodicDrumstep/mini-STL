@@ -53,14 +53,14 @@ class TrieStore {
     //     root. Otherwise, return std::nullopt.
     //throw NotImplementedException("TrieStore::Get is not implemented.");
     root_lock_.lock();
-    Trie & cur = root_;
+    Trie temp_root = root_;
     root_lock_.unlock();
-    const T * res = cur.Get<T>(key);
-    if (res == nullptr) 
+    const T* res = temp_root.Get<T>(key);
+    if (res == nullptr)
     {
-        return std::nullopt;
+      return std::nullopt;
     }
-    return ValueGuard<T>(cur, *(res));
+    return ValueGuard<T>(temp_root, *(res));
   }
   
   // This function will insert the key-value pair into the trie. If the key already exists in the
@@ -68,9 +68,13 @@ class TrieStore {
   template <class T>
   void Put(std::string_view key, T value)
   {
-    write_lock_.lock();
     root_lock_.lock();
-    root_ = root_.Put<T>(key, std::move(value));
+    Trie temp = root_;
+    root_lock_.unlock();
+    write_lock_.lock();
+    Trie new_root = temp.Put(key, std::move(value));
+    root_lock_.lock();
+    root_ = new_root;
     root_lock_.unlock();
     write_lock_.unlock();
   }
@@ -81,9 +85,13 @@ class TrieStore {
     // You will need to ensure there is only one writer at a time. Think of how you can achieve this.
     // The logic should be somehow similar to `TrieStore::Get`.
     //throw NotImplementedException("TrieStore::Remove is not implemented.");
-    write_lock_.lock();
     root_lock_.lock();
-    root_ = root_.Remove(key);
+    Trie temp = root_;
+    root_lock_.unlock();
+    write_lock_.lock();
+    Trie new_root = temp.Remove(key);
+    root_lock_.lock();
+    root_ = new_root;
     root_lock_.unlock();
     write_lock_.unlock();
   }
